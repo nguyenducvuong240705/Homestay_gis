@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bản đồ vùng Homestay TP.HCM</title>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"
+    />
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+        height: 100vh;
+        font-family: Arial;
+      }
+      #map {
+        flex: 3;
+      }
+      #sidebar {
+        flex: 1;
+        padding: 15px;
+        background: #f4f4f4;
+        overflow-y: auto;
+      }
+      input,
+      select,
+      button {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 8px;
+      }
+      button {
+        background: #5b4df2;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      .homestay-item {
+        border-bottom: 1px solid #ccc;
+        padding: 8px 0;
+      }
+      .homestay-item a {
+        color: blue;
+        cursor: pointer;
+      }
+      h3 {
+        margin-top: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="map"></div>
+
+    <div id="sidebar">
+      <h3>Danh sách Homestay</h3>
+
+      <input type="text" id="searchName" placeholder="Tên homestay" />
+
+      <select id="searchDistrict">
+        <option value="">-- Chọn quận --</option>
+      </select>
+
+      <button onclick="searchHomestays()">Tìm kiếm</button>
+      <button onclick="resetSearch()">Khoanh vùng homestay</button>
+
+      <p id="resultCount"></p>
+      <div id="homestayList"></div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
