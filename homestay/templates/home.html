@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>WebGIS Homestay TP.HCM</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+    url("https://images.unsplash.com/photo-1505693416388-ac5ce068fe85");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    text-align: center;
+    color: white;
+    background: rgba(255,255,255,0.1);
+    padding: 60px;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+}
+
+h1 {
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 16px;
+    margin-bottom: 40px;
+    opacity: 0.9;
+}
+
+.buttons {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    background: #a67c52;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.btn:hover {
+    background: #8b5e3c;
+    transform: translateY(-5px);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🏡 HỆ THỐNG WEBGIS HOMESTAY TP.HCM</h1>
+    <div class="subtitle">Tìm kiếm – Lọc – Xem vị trí homestay dễ dàng trên bản đồ</div>
+
+    <div class="buttons">
+        <a href="/map/" class="btn">🗺️ Xem Bản Đồ</a>
+        <a href="{% url 'booking' %}" class="btn">🛏️ Đặt</a>
+        <a href="{% url 'manage' %}" class="btn">⚙️ Quản lý</a>
+        <a href="/admin/" class="btn">🔐 Admin</a>
+    </div>
+</div>
+
+</body>
+</html>

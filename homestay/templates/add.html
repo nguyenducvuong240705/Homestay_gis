@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thêm Homestay</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            width: 400px;
+            margin: auto;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            background: #00c6ff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0072ff;
+        }
+
+        a {
+            display: block;
+            margin-top: 15px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>➕ Thêm Homestay</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Tên Homestay" required>
+        <input type="text" name="district" placeholder="Khu vực" required>
+        <input type="number" name="price" placeholder="Giá" required>
+        <button type="submit">Lưu</button>
+    </form>
+
+    <a href="{% url 'manage' %}">⬅ Quay lại</a>
+</div>
+
+</body>
+</html>

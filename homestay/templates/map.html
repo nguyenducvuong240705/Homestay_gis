@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Bản đồ Homestay TP.HCM</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css"/>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+    background: #1877f2;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 22px;
+}
+
+.controls {
+    padding: 15px;
+    background: #f4f4f4;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.controls input, .controls select {
+    padding: 8px;
+    font-size: 14px;
+}
+
+button {
+    padding: 8px 15px;
+    background: #1877f2;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0d5bd7;
+}
+
+#map {
+    height: 500px;
+}
+
+.home-btn {
+    margin: 10px;
+    display: inline-block;
+}
+</style>
+</head>
+
+<body>
+
+<header>BẢN ĐỒ HOMESTAY TP.HCM</header>
+
+<div class="controls">
+    <input type="text" id="searchName" placeholder="Tìm theo tên">
+
+    <select id="districtFilter">
+        <option value="">Tất cả quận</option>
+        <option value="1">Quận 1</option>
+        <option value="Bình Thạnh">Bình Thạnh</option>
+        <option value="Thủ Đức">Thủ Đức</option>
+        <option value="7">Quận 7</option>
+    </select>
+
+    <input type="number" id="minPrice" placeholder="Giá từ">
+    <input type="number" id="maxPrice" placeholder="Giá đến">
+
+    <select id="sortPrice">
+        <option value="">Sắp xếp giá</option>
+        <option value="asc">Giá tăng dần</option>
+        <option value="desc">Giá giảm dần</option>
+    </select>
+
+    <button onclick="filterData()">Lọc</button>
+    <button onclick="resetMap()">Reset</button>
+</div>
+
+<div id="map"></div>
+
+<div class="home-btn">
+    <a href="/">⬅ Về Trang Chủ</a>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+
+<script>
+// ===== DỮ LIỆU 5 HOMESTAY =====
+const homestays = [
+{
+  name: "Saigon Riverside Homestay",
+  district: "1",
+  price: 650000,
+  lat: 10.7765,
+  lng: 106.7059
+},
+{
+  name: "Landmark 81 Stay",
+  district: "Bình Thạnh",
+  price: 900000,
+  lat: 10.7952,
+  lng: 106.7218
+},
+{
+  name: "Ben Thanh Cozy House",
+  district: "1",
+  price: 550000,
+  lat: 10.7721,
+  lng: 106.6983
+},
+{
+  name: "Thao Dien Chill Home",
+  district: "Thủ Đức",
+  price: 700000,
+  lat: 10.8033,
+  lng: 106.7405
+},
+{
+  name: "Phu My Hung Modern Stay",
+  district: "7",
+  price: 800000,
+  lat: 10.7290,
+  lng: 106.7075
+}
+];
+
+// ===== TẠO MAP =====
+const map = L.map('map').setView([10.7769, 106.7009], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+let markers = [];
+
+function loadMarkers(data) {
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    data.forEach(h => {
+        const marker = L.marker([h.lat, h.lng])
+            .addTo(map)
+            .bindPopup(`<b>${h.name}</b><br>Quận: ${h.district}<br>Giá: ${h.price.toLocaleString()} VND`);
+        markers.push(marker);
+    });
+}
+
+// HIỂN THỊ SẴN 5 ĐỊA CHỈ KHI MỞ MAP
+loadMarkers(homestays);
+
+// ===== FILTER =====
+function filterData() {
+    let search = document.getElementById("searchName").value.toLowerCase();
+    let district = document.getElementById("districtFilter").value;
+    let minPrice = document.getElementById("minPrice").value;
+    let maxPrice = document.getElementById("maxPrice").value;
+    let sort = document.getElementById("sortPrice").value;
+
+    let filtered = homestays.filter(h => {
+        return (
+            (h.name.toLowerCase().includes(search)) &&
+            (district === "" || h.district === district) &&
+            (minPrice === "" || h.price >= minPrice) &&
+            (maxPrice === "" || h.price <= maxPrice)
+        );
+    });
+
+    if (sort === "asc") filtered.sort((a,b) => a.price - b.price);
+    if (sort === "desc") filtered.sort((a,b) => b.price - a.price);
+
+    loadMarkers(filtered);
+}
+
+function resetMap() {
+    document.getElementById("searchName").value = "";
+    document.getElementById("districtFilter").value = "";
+    document.getElementById("minPrice").value = "";
+    document.getElementById("maxPrice").value = "";
+    document.getElementById("sortPrice").value = "";
+    loadMarkers(homestays);
+}
+
+// ===== KHOANH VÙNG =====
+const drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+
+const drawControl = new L.Control.Draw({
+    draw: {
+        polygon: true,
+        rectangle: true,
+        circle: false,
+        marker: false,
+        polyline: false
+    },
+    edit: {
+        featureGroup: drawnItems
+    }
+});
+map.addControl(drawControl);
+
+map.on(L.Draw.Event.CREATED, function (event) {
+    const layer = event.layer;
+    drawnItems.addLayer(layer);
+
+    const bounds = layer.getBounds();
+    const inside = homestays.filter(h =>
+        bounds.contains([h.lat, h.lng])
+    );
+
+    loadMarkers(inside);
+});
+</script>
+
+</body>
+</html>

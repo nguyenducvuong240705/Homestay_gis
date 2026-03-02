@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Đặt Homestay</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: white;
+        }
+
+        .container {
+            width: 50%;
+            margin: 60px auto;
+            background: white;
+            color: black;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #243b55;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #141e30;
+        }
+
+        .back {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .back a {
+            color: #243b55;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🏡 Đặt Homestay</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Chọn Homestay:</label>
+        <select name="homestay" required>
+            {% for h in homestays %}
+            <option value="{{ h.id }}">
+                {{ h.name }} - {{ h.price }} VND
+            </option>
+            {% endfor %}
+        </select>
+
+        <label>Họ và tên:</label>
+        <input type="text" name="customer_name" required>
+
+        <label>Số điện thoại:</label>
+        <input type="text" name="phone" required>
+
+        <label>Ngày nhận phòng:</label>
+        <input type="date" name="check_in" required>
+
+        <label>Ngày trả phòng:</label>
+        <input type="date" name="check_out" required>
+
+        <button type="submit">Xác nhận đặt</button>
+    </form>
+
+    <div class="back">
+        <a href="/">⬅ Quay về trang chủ</a>
+    </div>
+</div>
+
+</body>
+</html>

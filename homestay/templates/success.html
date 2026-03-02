@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Đặt Thành Công</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: linear-gradient(to right, #1f4037, #99f2c8);
+            color: white;
+            text-align: center;
+        }
+
+        .box {
+            margin-top: 100px;
+            background: white;
+            color: black;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: green;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #1f4037;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background: #14532d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>🎉 Đặt phòng thành công!</h1>
+
+    <p><strong>Homestay:</strong> {{ booking.homestay.name }}</p>
+    <p><strong>Khách hàng:</strong> {{ booking.customer_name }}</p>
+    <p><strong>SĐT:</strong> {{ booking.phone }}</p>
+    <p><strong>Check-in:</strong> {{ booking.check_in }}</p>
+    <p><strong>Check-out:</strong> {{ booking.check_out }}</p>
+
+    <a href="/" class="btn">🏠 Trang chủ</a>
+    <a href="/manage/" class="btn">📋 Quản lý</a>
+</div>
+
+</body>
+</html>

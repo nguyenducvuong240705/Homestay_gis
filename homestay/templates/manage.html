@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quản lý</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: linear-gradient(to right, #243B55, #141E30);
+            color: white;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        th {
+            background: rgba(255,255,255,0.1);
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .add { background: #00c6ff; }
+        .edit { background: #f39c12; }
+        .delete { background: #e74c3c; }
+        .approve { background: #2ecc71; }
+        .reject { background: #e74c3c; }
+
+        .status-approved { color: #2ecc71; font-weight: bold; }
+        .status-rejected { color: #ff6b6b; font-weight: bold; }
+        .status-pending { color: #f1c40f; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h1>Trang Quản Lý</h1>
+
+<div class="container">
+
+    <h2>Danh Sách Homestay</h2>
+
+    <a href="{% url 'add' %}" class="btn add">+ Thêm Homestay</a>
+
+    <table>
+        <tr>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>Địa điểm</th>
+            <th>Hành động</th>
+        </tr>
+
+        {% for h in homestays %}
+        <tr>
+            <td>{{ h.name }}</td>
+            <td>{{ h.price }} VND</td>
+            <td>{{ h.location }}</td>
+            <td>
+                <a href="{% url 'edit' h.id %}" class="btn edit">Sửa</a>
+                <a href="{% url 'delete' h.id %}" class="btn delete">Xóa</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Chưa có homestay</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h2>Danh Sách Đơn Đặt Phòng</h2>
+
+    <table>
+        <tr>
+            <th>Homestay</th>
+            <th>Khách hàng</th>
+            <th>SĐT</th>
+            <th>Nhận phòng</th>
+            <th>Trả phòng</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+
+        {% for b in bookings %}
+        <tr>
+            <td>{{ b.homestay.name }}</td>
+            <td>{{ b.customer_name }}</td>
+            <td>{{ b.phone }}</td>
+            <td>{{ b.check_in }}</td>
+            <td>{{ b.check_out }}</td>
+
+            <td>
+                {% if b.status == "approved" %}
+                    <span class="status-approved">Đã xác nhận</span>
+                {% elif b.status == "rejected" %}
+                    <span class="status-rejected">Đã từ chối</span>
+                {% else %}
+                    <span class="status-pending">Chờ xử lý</span>
+                {% endif %}
+            </td>
+
+            <td>
+                {% if b.status == "pending" %}
+                    <a href="{% url 'approve_booking' b.id %}" class="btn approve">Xác nhận</a>
+                    <a href="{% url 'reject_booking' b.id %}" class="btn reject">Từ chối</a>
+                {% else %}
+                    ---
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">Chưa có đơn đặt nào</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+</body>
+</html>
