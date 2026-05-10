@@ -1,0 +1,40 @@
+<!-- overview.html -->
+<div class="stats">
+    <div class="card">
+        <h3>Tổng đặt phòng</h3>
+        <p>{{ total_booking }}</p>
+    </div>
+    <div class="card">
+        <h3>Tổng doanh thu</h3>
+        <p>{{ total_revenue }} đ</p>
+    </div>
+    <div class="card">
+        <h3>Tổng homestay</h3>
+        <p>{{ total_homestay }}</p>
+    </div>
+</div>
+
+<h2>Booking gần đây</h2>
+<table>
+<tr>
+<th>Khách</th>
+<th>Homestay</th>
+<th>Status</th>
+</tr>
+
+{% for b in recent_bookings %}
+<tr>
+<td>{{ b.guest_name }}</td>
+<td>{{ b.homestay.name }}</td>
+<td>
+{% if b.status == "pending" %}
+<span style="color:orange;">Đang chờ</span>
+{% elif b.status == "confirmed" %}
+<span style="color:green;">Đã duyệt</span>
+{% else %}
+<span style="color:red;">Từ chối</span>
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+</table>

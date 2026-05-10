@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Homestay</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ================= RESET ================= */
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        /* ================= THEME ================= */
+        :root{
+            --bg:#f4f7fb;
+            --card:#ffffff;
+            --text:#0f172a;
+            --muted:#64748b;
+            --sidebar:#0f172a;
+            --primary:#3b82f6;
+            --primary-soft:#dbeafe;
+            --success:#16a34a;
+            --success-soft:#dcfce7;
+            --warning:#f59e0b;
+            --warning-soft:#fef3c7;
+            --danger:#ef4444;
+            --danger-soft:#fee2e2;
+            --border:#e2e8f0;
+            --shadow:0 10px 30px rgba(15, 23, 42, 0.08);
+            --shadow-hover:0 14px 34px rgba(15, 23, 42, 0.12);
+            --radius:18px;
+        }
+
+        body{
+            font-family:Poppins, sans-serif;
+            background:linear-gradient(135deg, #eef4ff 0%, #f8fafc 100%);
+            color:var(--text);
+        }
+
+        /* ================= LAYOUT ================= */
+        .container{
+            display:flex;
+            min-height:100vh;
+        }
+
+        .sidebar{
+            width:270px;
+            background:linear-gradient(180deg, #081225 0%, #0f172a 100%);
+            padding:26px 18px;
+            color:white;
+            position:sticky;
+            top:0;
+            height:100vh;
+            box-shadow:6px 0 24px rgba(2,6,23,0.15);
+        }
+
+        .brand{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            margin-bottom:28px;
+            padding:10px 10px 18px;
+            border-bottom:1px solid rgba(255,255,255,0.08);
+        }
+
+        .brand-icon{
+            width:44px;
+            height:44px;
+            border-radius:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:linear-gradient(135deg, #2563eb, #60a5fa);
+            font-size:22px;
+            box-shadow:0 10px 20px rgba(37,99,235,0.25);
+        }
+
+        .brand-text h2{
+            font-size:20px;
+            margin:0;
+            color:#fff;
+        }
+
+        .brand-text p{
+            font-size:12px;
+            color:#94a3b8;
+            margin-top:2px;
+        }
+
+        .nav-title{
+            font-size:12px;
+            text-transform:uppercase;
+            letter-spacing:1px;
+            color:#64748b;
+            margin:18px 10px 12px;
+        }
+
+        .sidebar a{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding:13px 14px;
+            margin-bottom:8px;
+            border-radius:14px;
+            text-decoration:none;
+            color:#cbd5e1;
+            font-size:14px;
+            font-weight:500;
+            transition:all 0.25s ease;
+        }
+
+        .sidebar a:hover{
+            background:rgba(255,255,255,0.08);
+            color:white;
+            transform:translateX(4px);
+        }
+
+        .sidebar a.active{
+            background:linear-gradient(135deg, #2563eb, #60a5fa);
+            color:white;
+            box-shadow:0 12px 24px rgba(37,99,235,0.25);
+        }
+
+        .main{
+            flex:1;
+            padding:30px;
+        }
+
+        .topbar{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:16px;
+            margin-bottom:24px;
+            flex-wrap:wrap;
+        }
+
+        .page-title h1{
+            font-size:32px;
+            margin-bottom:6px;
+            font-weight:700;
+        }
+
+        .page-title p{
+            color:var(--muted);
+            font-size:14px;
+        }
+
+        .topbar-badge{
+            background:var(--card);
+            border:1px solid var(--border);
+            box-shadow:var(--shadow);
+            padding:12px 16px;
+            border-radius:14px;
+            color:var(--muted);
+            font-size:13px;
+            font-weight:500;
+        }
+
+        /* ================= STATS ================= */
+        .stats{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+            gap:18px;
+            margin-bottom:28px;
+        }
+
+        .card{
+            background:var(--card);
+            border:1px solid rgba(226,232,240,0.8);
+            padding:22px;
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            transition:all 0.25s ease;
+            position:relative;
+            overflow:hidden;
+        }
+
+        .card::before{
+            content:"";
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:5px;
+            background:linear-gradient(90deg, #2563eb, #60a5fa);
+        }
+
+        .card:hover{
+            transform:translateY(-4px);
+            box-shadow:var(--shadow-hover);
+        }
+
+        .card h3{
+            font-size:14px;
+            color:var(--muted);
+            font-weight:500;
+            margin-bottom:8px;
+        }
+
+        .card p{
+            font-size:30px;
+            font-weight:700;
+            color:var(--text);
+        }
+
+        .section-title{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin:26px 0 14px;
+            flex-wrap:wrap;
+        }
+
+        .section-title h2{
+            font-size:22px;
+            margin:0;
+        }
+
+        .section-title .subtitle{
+            color:var(--muted);
+            font-size:13px;
+        }
+
+        /* ================= FORM ================= */
+        .toolbar{
+            background:var(--card);
+            border:1px solid var(--border);
+            box-shadow:var(--shadow);
+            border-radius:18px;
+            padding:16px;
+            margin-bottom:16px;
+        }
+
+        .toolbar form{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            align-items:center;
+        }
+
+        input{
+            padding:11px 13px;
+            border:1px solid var(--border);
+            border-radius:12px;
+            background:#fff;
+            color:var(--text);
+            outline:none;
+            min-width:180px;
+            font-family:inherit;
+        }
+
+        input:focus{
+            border-color:#93c5fd;
+            box-shadow:0 0 0 4px rgba(59,130,246,0.12);
+        }
+
+        button{
+            border:none;
+            cursor:pointer;
+            transition:0.2s;
+            font-family:inherit;
+        }
+
+        .btn{
+            padding:11px 14px;
+            border-radius:12px;
+            font-size:14px;
+            font-weight:600;
+        }
+
+        .btn-primary{
+            background:linear-gradient(135deg, #2563eb, #3b82f6);
+            color:white;
+        }
+
+        .btn-primary:hover{
+            transform:translateY(-1px);
+            filter:brightness(0.98);
+        }
+
+        .accept{
+            background:var(--success);
+            color:white;
+            padding:7px 12px;
+            border-radius:10px;
+            font-size:13px;
+            font-weight:600;
+        }
+
+        .accept:hover{
+            filter:brightness(0.95);
+        }
+
+        .reject{
+            background:var(--danger);
+            color:white;
+            padding:7px 12px;
+            border-radius:10px;
+            font-size:13px;
+            font-weight:600;
+        }
+
+        .reject:hover{
+            filter:brightness(0.95);
+        }
+
+        /* ================= TABLE ================= */
+        .table-card{
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:20px;
+            box-shadow:var(--shadow);
+            overflow:hidden;
+        }
+
+        .table-wrap{
+            width:100%;
+            overflow-x:auto;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            background:transparent;
+        }
+
+        thead th{
+            background:#0f172a;
+            color:white;
+            padding:14px 16px;
+            text-align:left;
+            font-size:13px;
+            font-weight:600;
+            white-space:nowrap;
+        }
+
+        tbody td{
+            padding:14px 16px;
+            border-bottom:1px solid var(--border);
+            font-size:14px;
+            vertical-align:middle;
+        }
+
+        tbody tr{
+            transition:background 0.2s ease;
+        }
+
+        tbody tr:hover{
+            background:#f8fbff;
+        }
+
+        tbody tr:last-child td{
+            border-bottom:none;
+        }
+
+        .status{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            padding:7px 11px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .status.pending{
+            color:#b45309;
+            background:var(--warning-soft);
+        }
+
+        .status.confirmed{
+            color:#166534;
+            background:var(--success-soft);
+        }
+
+        .status.rejected{
+            color:#b91c1c;
+            background:var(--danger-soft);
+        }
+
+        .empty-state{
+            text-align:center;
+            padding:28px 16px;
+            color:var(--muted);
+            font-size:14px;
+        }
+
+        /* ================= PAGINATION ================= */
+        .pagination{
+            margin-top:16px;
+            display:flex;
+            gap:10px;
+            align-items:center;
+            flex-wrap:wrap;
+        }
+
+        .pagination a{
+            padding:8px 12px;
+            background:#0f172a;
+            color:white;
+            border-radius:10px;
+            text-decoration:none;
+            font-size:13px;
+            font-weight:600;
+        }
+
+        .pagination span{
+            color:var(--muted);
+            font-size:14px;
+            font-weight:500;
+        }
+
+        /* ================= CHART ================= */
+        .chart-card{
+            background:var(--card);
+            border:1px solid var(--border);
+            padding:18px;
+            border-radius:20px;
+            box-shadow:var(--shadow);
+            margin-bottom:18px;
+        }
+
+        canvas{
+            width:100% !important;
+            max-height:360px;
+        }
+
+        /* ================= LIST ================= */
+        .top-list{
+            margin-top:16px;
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:18px;
+            box-shadow:var(--shadow);
+            padding:18px 20px;
+        }
+
+        .top-list h3{
+            margin-bottom:12px;
+            font-size:18px;
+        }
+
+        .top-list ul{
+            padding-left:18px;
+        }
+
+        .top-list li{
+            margin-bottom:10px;
+            color:var(--text);
+        }
+
+        /* ================= RESPONSIVE ================= */
+        @media(max-width: 992px){
+            .sidebar{
+                width:220px;
+            }
+        }
+
+        @media(max-width: 768px){
+            .container{
+                flex-direction:column;
+            }
+
+            .sidebar{
+                width:100%;
+                height:auto;
+                position:relative;
+            }
+
+            .main{
+                padding:18px;
+            }
+
+            .page-title h1{
+                font-size:26px;
+            }
+
+            .stats{
+                grid-template-columns:1fr;
+            }
+
+            .toolbar form{
+                flex-direction:column;
+                align-items:stretch;
+            }
+
+            input, .btn{
+                width:100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏠</div>
+            <div class="brand-text">
+                <h2>Quản trị</h2>
+                <p>WebGIS Homestay</p>
+            </div>
+        </div>
+
+        <div class="nav-title">Menu chính</div>
+        <a href="/dashboard/" class="{% if page == 'overview' %}active{% endif %}">📊 Tổng quan</a>
+        <a href="/dashboard/bookings/" class="{% if page == 'bookings' %}active{% endif %}">🛏️ Đặt phòng</a>
+        <a href="/dashboard/revenue/" class="{% if page == 'revenue' %}active{% endif %}">💰 Doanh thu</a>
+        <a href="/dashboard/homestays/" class="{% if page == 'homestays' %}active{% endif %}">🏡 Homestay</a>
+        <a href="/dashboard/approve-homestays/" class="{% if page == 'approve_homestays' %}active{% endif %}">✅ Duyệt bài đăng</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="topbar">
+            <div class="page-title">
+                <h1>Bảng điều khiển</h1>
+                <p>Quản lý booking, doanh thu và homestay trên hệ thống</p>
+            </div>
+            <div class="topbar-badge">
+                Admin Dashboard
+            </div>
+        </div>
+
+        <!-- ================= OVERVIEW ================= -->
+        {% if page == "overview" %}
+        <div class="stats">
+            <div class="card">
+                <h3>Tổng đặt phòng</h3>
+                <p>{{ total_booking }}</p>
+            </div>
+            <div class="card">
+                <h3>Tổng doanh thu</h3>
+                <p>{{ total_revenue }} đ</p>
+            </div>
+            <div class="card">
+                <h3>Tổng homestay</h3>
+                <p>{{ total_homestay }}</p>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <h2>Booking gần đây</h2>
+            <div class="subtitle">Hiển thị các booking mới nhất</div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Khách</th>
+                            <th>Homestay</th>
+                            <th>Phòng</th>
+                            <th>Check-in</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in recent_bookings %}
+                        <tr>
+                            <td>{{ b.guest_name }}</td>
+                            <td>
+                                {% if b.homestay %}
+                                    {{ b.homestay.name }}
+                                {% else %}
+                                    ---
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if b.room %}
+                                    Phòng {{ b.room.room_number }}
+                                {% else %}
+                                    ---
+                                {% endif %}
+                            </td>
+                            <td>{{ b.check_in }}</td>
+                            <td>
+                                {% if b.status == "pending" %}
+                                    <span class="status pending">Đang chờ</span>
+                                {% elif b.status == "confirmed" %}
+                                    <span class="status confirmed">Đã duyệt</span>
+                                {% else %}
+                                    <span class="status rejected">Từ chối</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="empty-state">Chưa có booking nào</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ================= BOOKING ================= -->
+        {% if page == "bookings" %}
+        <div class="section-title">
+            <h2>Danh sách Booking</h2>
+            <div class="subtitle">Quản lý và duyệt booking từ người dùng</div>
+        </div>
+
+        <div class="toolbar">
+            <form method="get">
+                <input name="q" placeholder="Tìm khách..." value="{{ keyword }}">
+                <button class="btn btn-primary" type="submit">Tìm</button>
+            </form>
+        </div>
+
+        <div class="table-card">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Khách</th>
+                            <th>Homestay</th>
+                            <th>Check-in</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in page_obj %}
+                        <tr>
+                            <td>{{ b.id }}</td>
+                            <td>{{ b.guest_name }}</td>
+                            <td>{{ b.homestay.name }}</td>
+                            <td>{{ b.check_in }}</td>
+                            <td>
+                                {% if b.status == "pending" %}
+                                    <span class="status pending">Đang chờ</span>
+                                {% elif b.status == "confirmed" %}
+                                    <span class="status confirmed">Đã duyệt</span>
+                                {% else %}
+                                    <span class="status rejected">Từ chối</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if b.status == "pending" %}
+                                    <a href="/approve-booking/{{ b.id }}/?next=/dashboard/bookings/">
+                                        <button type="button" class="accept">✔ Duyệt</button>
+                                    </a>
+                                    <a href="/reject-booking/{{ b.id }}/?next=/dashboard/bookings/">
+                                        <button type="button" class="reject">✖ Từ chối</button>
+                                    </a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty-state">Chưa có booking nào</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">← Trước</a>
+            {% endif %}
+            <span>Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Sau →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- ================= REVENUE ================= -->
+        {% if page == "revenue" %}
+        <div class="section-title">
+            <h2>Doanh thu</h2>
+            <div class="subtitle">Theo dõi doanh thu từ các booking đã duyệt</div>
+        </div>
+
+        <div class="stats">
+            <div class="card">
+                <h3>Tổng doanh thu</h3>
+                <p>{{ total }} đ</p>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <form method="get">
+                <input type="date" name="start">
+                <input type="date" name="end">
+                <button class="btn btn-primary" type="submit">Lọc</button>
+            </form>
+        </div>
+
+        <div class="chart-card">
+            <canvas id="chart"></canvas>
+        </div>
+
+        {{ labels|json_script:"labels-data" }}
+        {{ data|json_script:"data-data" }}
+
+        <script>
+            const labelsElement = document.getElementById('labels-data');
+            const dataElement = document.getElementById('data-data');
+
+            if (labelsElement && dataElement) {
+                const labels = JSON.parse(labelsElement.textContent);
+                const data = JSON.parse(dataElement.textContent);
+
+                new Chart(document.getElementById("chart"), {
+                    type: "line",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Doanh thu",
+                            data: data,
+                            borderWidth: 2,
+                            tension: 0.35,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true
+                            }
+                        }
+                    }
+                });
+            }
+        </script>
+
+        <div class="table-card">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Khách</th>
+                            <th>Homestay</th>
+                            <th>Tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in page_obj %}
+                        <tr>
+                            <td>{{ b.id }}</td>
+                            <td>{{ b.guest_name }}</td>
+                            <td>{{ b.homestay.name }}</td>
+                            <td>{{ b.total_price }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="empty-state">Chưa có dữ liệu doanh thu</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="top-list">
+            <h3>Top Homestay</h3>
+            <ul>
+                {% for t in top %}
+                    <li>{{ t.homestay__name }} - {{ t.total }} đ</li>
+                {% empty %}
+                    <li>Chưa có dữ liệu</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- ================= HOMESTAY ================= -->
+        {% if page == "homestays" %}
+        <div class="section-title">
+            <h2>Quản lý Homestay</h2>
+            <div class="subtitle">Thêm, sửa và xóa homestay</div>
+        </div>
+
+        <div class="toolbar">
+            <form action="/add-homestay/" method="post">
+                {% csrf_token %}
+                <input name="name" placeholder="Tên homestay" required>
+                <input name="address" placeholder="Địa chỉ" required>
+                <input name="image" placeholder="Link ảnh">
+                <button class="btn btn-primary" type="submit">Thêm homestay</button>
+            </form>
+        </div>
+
+        <div class="table-card">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên</th>
+                            <th>Địa chỉ</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for h in page_obj %}
+                        <tr>
+                            <td>{{ h.id }}</td>
+                            <td>{{ h.name }}</td>
+                            <td>{{ h.address }}</td>
+                            <td>
+                                <form action="/edit-homestay/{{ h.id }}/" method="post" style="display:inline-flex; gap:8px; flex-wrap:wrap;">
+                                    {% csrf_token %}
+                                    <input name="name" placeholder="Tên mới">
+                                    <input name="address" placeholder="Địa chỉ mới">
+                                    <button class="accept" type="submit">Sửa</button>
+                                </form>
+
+                                <a href="/delete-homestay/{{ h.id }}/">
+                                    <button type="button" class="reject">Xóa</button>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="empty-state">Chưa có homestay nào</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+</body>
+</html>

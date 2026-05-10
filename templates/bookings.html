@@ -1,0 +1,57 @@
+<!-- bookings.html -->
+<h2>Danh sách Booking</h2>
+
+<form method="get">
+    <input name="q" placeholder="Tìm khách..." value="{{ keyword }}">
+    <button>Tìm</button>
+</form>
+
+<table>
+<tr>
+<th>ID</th>
+<th>Khách</th>
+<th>Homestay</th>
+<th>Check-in</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+
+{% for b in page_obj %}
+<tr>
+<td>{{ b.id }}</td>
+<td>{{ b.guest_name }}</td>
+<td>{{ b.homestay.name }}</td>
+<td>{{ b.check_in }}</td>
+
+<td>
+{% if b.status == "pending" %}
+<span style="color:orange;">Đang chờ</span>
+{% elif b.status == "confirmed" %}
+<span style="color:green;">Đã duyệt</span>
+{% else %}
+<span style="color:red;">Từ chối</span>
+{% endif %}
+</td>
+
+<td>
+{% if b.status == "pending" %}
+<a href="/approve-booking/{{ b.id }}/"><button class="accept">✔</button></a>
+<a href="/reject-booking/{{ b.id }}/"><button class="reject">✖</button></a>
+{% else %}
+-
+{% endif %}
+</td>
+
+</tr>
+{% endfor %}
+</table>
+
+<div class="pagination">
+{% if page_obj.has_previous %}
+<a href="?page={{ page_obj.previous_page_number }}">←</a>
+{% endif %}
+Trang {{ page_obj.number }}
+{% if page_obj.has_next %}
+<a href="?page={{ page_obj.next_page_number }}">→</a>
+{% endif %}
+</div>

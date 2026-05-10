@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Liên hệ</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css"/>
+
+<style>
+body{
+background:#f5f7fb;
+font-family:Arial;
+}
+
+/* HERO */
+.hero{
+height:50vh;
+background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+url("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267");
+background-size:cover;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+text-align:center;
+}
+
+/* FORM BOX */
+.contact-box{
+background:white;
+padding:40px;
+border-radius:18px;
+box-shadow:0 20px 40px rgba(0,0,0,0.1);
+margin-top:-80px;
+transition:0.3s;
+}
+
+.contact-box:hover{
+transform:translateY(-5px);
+}
+
+/* INPUT */
+.form-control{
+border-radius:10px;
+padding:12px;
+transition:0.3s;
+}
+
+.form-control:focus{
+border-color:#ff385c;
+box-shadow:0 0 10px rgba(255,56,92,0.4);
+}
+
+/* BUTTON */
+button{
+background:#ff385c;
+border:none;
+padding:12px;
+font-weight:bold;
+transition:0.3s;
+}
+
+button:hover{
+background:black;
+transform:scale(1.02);
+}
+
+/* INFO */
+.info-box{
+background:#ff385c;
+color:white;
+padding:30px;
+border-radius:18px;
+height:100%;
+box-shadow:0 20px 40px rgba(0,0,0,0.15);
+}
+
+.info-box i{
+margin-right:10px;
+}
+
+/* SOCIAL */
+.social a{
+display:flex;
+align-items:center;
+margin-top:12px;
+color:white;
+text-decoration:none;
+font-weight:500;
+transition:0.3s;
+}
+
+.social a i{
+margin-right:10px;
+font-size:18px;
+}
+
+.social a:hover{
+transform:translateX(5px);
+opacity:0.8;
+}
+
+/* ALERT */
+.alert{
+border-radius:10px;
+}
+
+@media (max-width: 768px) {
+    .hero { height: auto; padding: 60px 20px; }
+    .contact-box { margin-top: 20px; padding: 25px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<div class="hero">
+<div>
+<h1 data-aos="fade-down">Liên hệ với chúng tôi</h1>
+<p data-aos="fade-up">Hãy gửi phản hồi hoặc câu hỏi cho chúng tôi</p>
+</div>
+</div>
+
+<div class="container">
+
+<div class="row g-4">
+
+<!-- FORM -->
+<div class="col-md-7" data-aos="fade-right">
+<div class="contact-box">
+
+<h3 class="mb-4">📩 Gửi phản hồi</h3>
+
+<form method="POST">
+{% csrf_token %}
+
+<input name="name" class="form-control mb-3" placeholder="👤 Họ tên">
+<input name="email" class="form-control mb-3" placeholder="📧 Email">
+<textarea name="message" class="form-control mb-3" rows="5" placeholder="✍️ Nội dung"></textarea>
+
+<button class="btn btn-danger w-100">Gửi ngay</button>
+</form>
+
+{% if success %}
+<div class="alert alert-success mt-3">✅ Gửi thành công!</div>
+{% endif %}
+
+</div>
+</div>
+
+<!-- INFO -->
+<div class="col-md-5" data-aos="fade-left">
+<div class="info-box">
+
+<h4>📍 Thông tin liên hệ</h4>
+
+<p><i class="fas fa-map-marker-alt"></i> TP.HCM, Việt Nam</p>
+<p><i class="fas fa-phone"></i> 0333 117 343</p>
+<p><i class="fas fa-envelope"></i> nguyenvu772005@gmail.com</p>
+
+<hr>
+
+<h5>🌐 Mạng xã hội</h5>
+
+<div class="social">
+<a href="https://www.facebook.com/nguyen.vu.938604" target="_blank">
+<i class="fab fa-facebook"></i> Facebook
+</a>
+
+<a href="https://www.instagram.com/nguyenvu_7705" target="_blank">
+<i class="fab fa-instagram"></i> Instagram
+</a>
+</div>
+
+</div>
+</div>
+
+</div>
+
+</div>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+AOS.init({
+duration:1000,
+once:true
+});
+</script>
+
+{% include 'footer.html' %}
+</body>
+</html>

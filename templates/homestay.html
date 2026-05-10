@@ -1,0 +1,56 @@
+<!-- homestays.html -->
+<h2>Quản lý Homestay</h2>
+
+<form action="/add/" method="post">
+{% csrf_token %}
+<input name="name" placeholder="Tên" required>
+<input name="address" placeholder="Địa chỉ" required>
+<input name="image" placeholder="Link ảnh">
+<button class="accept">Thêm</button>
+</form>
+
+<table>
+<tr>
+<th>ID</th>
+<th>Tên</th>
+<th>Địa chỉ</th>
+<th>Trạng thái</th>
+<th>Action</th>
+</tr>
+
+{% for h in page_obj %}
+<tr>
+<td>{{ h.id }}</td>
+<td>{{ h.name }}</td>
+<td>{{ h.address }}</td>
+
+<td>
+{% if h.status == "pending" %}
+<span style="color:orange;">Chờ duyệt</span>
+{% elif h.status == "approved" %}
+<span style="color:green;">Đã duyệt</span>
+{% else %}
+<span style="color:red;">Từ chối</span>
+{% endif %}
+</td>
+
+<td>
+{% if h.status == "pending" %}
+<a href="/approve/{{ h.id }}/"><button class="accept">✔ Duyệt</button></a>
+<a href="/reject/{{ h.id }}/"><button class="reject">✖ Từ chối</button></a>
+{% else %}
+-
+{% endif %}
+
+<form action="/edit/{{ h.id }}/" method="post" style="display:inline;">
+{% csrf_token %}
+<input name="name" placeholder="Tên mới">
+<input name="address" placeholder="Địa chỉ mới">
+<button class="accept">Sửa</button>
+</form>
+
+<a href="/delete/{{ h.id }}/"><button class="reject">Xóa</button></a>
+</td>
+</tr>
+{% endfor %}
+</table>

@@ -1,7 +1,43 @@
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from homestay import views
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", include("homestay.urls")),
+    path('', views.index, name='home'),
+    path('map/', views.map_view, name='map'),
+    path('about/', views.about, name='about'),
+    path('contact/', views.contact, name='contact'),
+
+    path('homestay/<int:id>/', views.homestay_detail, name='detail'),
+    path('api/homestays/', views.homestay_api, name='api_homestays'),
+
+    path('user/', views.user_profile, name='user_profile'),
+
+    path('login/', views.login_view, name='login'),
+    path('admin-login/', views.admin_login_view, name='admin_login'),
+    path('register/', views.register_view, name='register'),
+    path('logout/', views.logout_view, name='logout'),
+
+    path('lookup/', views.lookup_booking, name='lookup_booking'),
+
+    path('booking/<int:id>/', views.booking, name='booking'),
+    path('success/<int:booking_id>/', views.success, name='success'),
+    path('api/book-room/', views.book_room, name='book_room'),
+
+    path('dashboard/', views.dashboard, name='manage'),
+    path('dashboard/bookings/', views.dashboard_bookings, name='dashboard_bookings'),
+    path('dashboard/revenue/', views.dashboard_revenue, name='dashboard_revenue'),
+    path('dashboard/homestays/', views.dashboard_homestays, name='dashboard_homestays'),
+    path('dashboard/approve-homestays/', views.dashboard_approve_homestays, name='dashboard_approve_homestays'),
+    path('dashboard/approve/<int:id>/', views.approve_homestay, name='approve_homestay'),
+    path('dashboard/reject/<int:id>/', views.reject_homestay, name='reject_homestay'),
+
+    path('approve/<int:id>/', views.approve_homestay, name='approve_homestay_old'),
+    path('reject/<int:id>/', views.reject_homestay, name='reject_homestay_old'),
+
+    path('add/', views.add_homestay, name='add_homestay'),
+    path('edit/<int:id>/', views.edit_homestay, name='edit_homestay'),
+    path('delete/<int:id>/', views.delete_homestay, name='delete_homestay'),
+
+    path('approve-booking/<int:id>/', views.accept_booking, name='approve_booking'),
+    path('reject-booking/<int:id>/', views.reject_booking, name='reject_booking'),
 ]

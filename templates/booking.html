@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Thanh toán đặt phòng</title>
+
+<style>
+
+body{
+font-family:Arial,Helvetica,sans-serif;
+background:linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+display:flex;
+flex-direction:column;
+min-height:100vh;
+margin:0;
+}
+
+.main-wrapper{
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+width:100%;
+}
+
+/* success banner */
+
+.banner-success{
+position:fixed;
+top:-100px;
+left:0;
+width:100%;
+background:linear-gradient(90deg,#28a745,#1e7e34);
+color:white;
+text-align:center;
+padding:18px;
+font-size:18px;
+font-weight:bold;
+transition:0.6s;
+z-index:999;
+}
+
+.banner-show{
+top:0;
+}
+
+/* main card */
+
+.card{
+background:white;
+width:100%;
+max-width:480px;
+padding:35px;
+border-radius:14px;
+box-shadow:0 20px 40px rgba(0,0,0,0.25);
+}
+
+h2{
+text-align:center;
+margin-bottom:20px;
+}
+
+/* inputs */
+
+input,select{
+width:100%;
+padding:12px;
+margin:8px 0;
+border-radius:8px;
+border:1px solid #ddd;
+font-size:14px;
+}
+
+/* button */
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:8px;
+background:linear-gradient(90deg,#007bff,#0056b3);
+color:white;
+font-size:16px;
+margin-top:15px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.03);
+}
+
+/* payment section */
+
+#paymentSection{
+display:none;
+margin-top:20px;
+border-top:1px solid #eee;
+padding-top:20px;
+}
+
+/* payment box */
+
+.payment-box{
+background:#f7f7f7;
+padding:15px;
+border-radius:10px;
+margin-top:12px;
+}
+
+/* credit card */
+
+.credit-card{
+background:linear-gradient(135deg,#141E30,#243B55);
+border-radius:14px;
+padding:22px;
+color:white;
+box-shadow:0 10px 25px rgba(0,0,0,0.4);
+margin-top:10px;
+}
+
+.credit-card input{
+background:rgba(255,255,255,0.15);
+border:none;
+color:white;
+}
+
+.card-row{
+display:flex;
+gap:10px;
+}
+
+.card-icons{
+margin-bottom:10px;
+}
+
+.card-icons img{
+width:55px;
+margin-right:10px;
+}
+
+/* momo */
+
+.qr-box{
+text-align:center;
+}
+
+.qr-box img{
+width:200px;
+margin-top:10px;
+}
+
+.qr-box p{
+font-weight:bold;
+}
+
+/* loading */
+
+.loader{
+display:none;
+text-align:center;
+margin-top:15px;
+}
+
+.loader div{
+width:40px;
+height:40px;
+border:4px solid #ddd;
+border-top:4px solid #007bff;
+border-radius:50%;
+animation:spin 1s linear infinite;
+margin:auto;
+}
+
+@keyframes spin{
+0%{transform:rotate(0)}
+100%{transform:rotate(360deg)}
+}
+
+/* back */
+
+.home{
+text-align:center;
+margin-top:15px;
+}
+
+.home a{
+text-decoration:none;
+color:#666;
+}
+
+@media (max-width: 600px) {
+    .card { padding: 20px; }
+    .card-row { flex-direction: column; }
+    .credit-card { padding: 15px; }
+}
+
+</style>
+
+</head>
+
+<body>
+<div class="main-wrapper">
+<div id="successBanner" class="banner-success">
+✅ Thanh toán thành công! Đang quay lại bản đồ...
+</div>
+
+<div class="card">
+
+<h2>Đặt phòng {{ homestay.name }}</h2>
+
+<input id="name" placeholder="Tên khách" value="{% if user.is_authenticated %}{{ user.username }}{% endif %}">
+
+<input id="phone" placeholder="SĐT">
+
+<input id="email" placeholder="Email">
+
+<label>Check-in</label>
+<input type="date" id="checkin" onchange="calculateTotal()">
+
+<label>Check-out</label>
+<input type="date" id="checkout" onchange="calculateTotal()">
+
+<!-- Bill Section -->
+<div id="billSection" style="display:none; background:#f0f8ff; padding:15px; border-radius:10px; margin-top:15px; border:1px solid #b0c4de;">
+    <h4 style="margin-top:0; text-align:center; color:#0056b3;">Chi tiết hóa đơn</h4>
+    <p>Giá mỗi đêm: <strong>{{ homestay.price_per_night }} VNĐ</strong></p>
+    <p>Số đêm: <strong id="nightsCount">0</strong></p>
+    <hr>
+    <h3 style="color:#28a745; text-align:center;">Tổng tiền: <span id="totalPrice">0</span> VNĐ</h3>
+</div>
+
+<button onclick="showPayment()" style="margin-top:20px;">Tiếp tục thanh toán</button>
+
+<div id="paymentSection">
+
+<h3>Phương thức thanh toán</h3>
+
+<label>
+<input type="radio" name="payment" value="hotel" checked>
+Thanh toán khi nhận phòng
+</label>
+
+<br><br>
+
+<label>
+<input type="radio" name="payment" value="online">
+Thanh toán trực tuyến
+</label>
+
+<div id="onlinePayment" style="display:none">
+
+<select id="paymentMethod" onchange="showMethod()">
+
+<option value="">Chọn phương thức</option>
+<option value="visa">Visa / Mastercard</option>
+<option value="momo">MoMo</option>
+
+</select>
+
+<!-- VISA -->
+
+<div id="visaForm" class="payment-box" style="display:none">
+
+<div class="card-icons">
+<img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png">
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png">
+</div>
+
+<div class="credit-card">
+
+<input placeholder="Card Number">
+
+<input placeholder="Cardholder Name">
+
+<div class="card-row">
+<input placeholder="MM/YY">
+<input placeholder="CVV">
+</div>
+
+</div>
+
+</div>
+
+<!-- MOMO -->
+
+<div id="momoForm" class="payment-box" style="display:none">
+
+<div class="qr-box">
+
+<p>Quét QR để thanh toán</p>
+
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=MoMo-Homestay-{{ homestay.id }}">
+
+<input placeholder="Số điện thoại MoMo">
+
+</div>
+
+</div>
+
+</div>
+
+<button onclick="bookRoom()">Xác nhận thanh toán</button>
+
+<div class="loader" id="loader">
+<div></div>
+<p>Đang xử lý thanh toán...</p>
+</div>
+
+</div>
+
+<div class="home">
+<a href="/map/">⬅ Quay lại bản đồ</a>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+function getCookie(name){
+
+let cookieValue=null;
+
+if(document.cookie && document.cookie!==""){
+
+const cookies=document.cookie.split(";");
+
+for(let i=0;i<cookies.length;i++){
+
+const cookie=cookies[i].trim();
+
+if(cookie.substring(0,name.length+1)===(name+"=")){
+
+cookieValue=decodeURIComponent(cookie.substring(name.length+1));
+break;
+
+}
+
+}
+
+}
+
+return cookieValue;
+
+}
+
+let pricePerNight = {{ homestay.price_per_night|default:0 }};
+
+function calculateTotal() {
+    let checkin = document.getElementById("checkin").value;
+    let checkout = document.getElementById("checkout").value;
+    
+    if (checkin && checkout) {
+        let ci = new Date(checkin);
+        let co = new Date(checkout);
+        let diffTime = co - ci;
+        let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 0) {
+            document.getElementById("nightsCount").innerText = diffDays;
+            document.getElementById("totalPrice").innerText = (diffDays * pricePerNight).toLocaleString('vi-VN');
+            document.getElementById("billSection").style.display = "block";
+        } else {
+            document.getElementById("billSection").style.display = "none";
+        }
+    }
+}
+
+/* show payment */
+
+function showPayment(){
+document.getElementById("paymentSection").style.display="block";
+}
+
+/* toggle payment */
+
+let radios=document.getElementsByName("payment");
+
+radios.forEach(r=>{
+r.addEventListener("change",function(){
+
+if(this.value=="online"){
+document.getElementById("onlinePayment").style.display="block";
+}else{
+document.getElementById("onlinePayment").style.display="none";
+}
+
+})
+})
+
+function showMethod(){
+
+let m=document.getElementById("paymentMethod").value;
+
+document.getElementById("visaForm").style.display="none";
+document.getElementById("momoForm").style.display="none";
+
+if(m=="visa"){
+document.getElementById("visaForm").style.display="block";
+}
+
+if(m=="momo"){
+document.getElementById("momoForm").style.display="block";
+}
+
+}
+
+/* booking */
+
+
+function bookRoom(){
+
+document.getElementById("loader").style.display="block";
+
+fetch("/api/book-room/",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"X-CSRFToken":getCookie("csrftoken")
+},
+body:JSON.stringify({
+room_id: {{ homestay.id }},
+name:document.getElementById("name").value,
+phone:document.getElementById("phone").value,
+email:document.getElementById("email").value,
+checkin:document.getElementById("checkin").value,
+checkout:document.getElementById("checkout").value
+})
+})
+
+.then(res=>{
+if(!res.ok){
+throw new Error("Server lỗi: " + res.status);
+}
+return res.json();
+})
+
+.then(data=>{
+
+document.getElementById("loader").style.display="none";
+
+let banner=document.getElementById("successBanner");
+banner.classList.add("banner-show");
+
+setTimeout(function(){
+window.location="/map/";
+},2000);
+
+})
+
+.catch(err=>{
+
+document.getElementById("loader").style.display="none";
+
+alert("❌ Thanh toán thất bại: " + err.message);
+
+console.error(err);
+
+});
+
+}
+
+</script>
+
+{% include 'footer.html' %}
+</body>
+</html>

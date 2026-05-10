@@ -1,0 +1,46 @@
+<!-- revenue.html -->
+<h2>Tổng doanh thu: {{ total }} đ</h2>
+
+<form method="get">
+<input type="date" name="start">
+<input type="date" name="end">
+<button>Lọc</button>
+</form>
+
+<canvas id="chart"></canvas>
+
+<script>
+const labels = JSON.parse(document.getElementById('labels-data').textContent);
+const data = JSON.parse(document.getElementById('data-data').textContent);
+
+new Chart(document.getElementById("chart"), {
+type: "line",
+data: {
+labels: labels,
+datasets: [{
+label: "Doanh thu",
+data: data,
+borderWidth: 2
+}]
+}
+});
+</script>
+
+<table>
+<tr><th>ID</th><th>Khách</th><th>Tiền</th></tr>
+
+{% for b in page_obj %}
+<tr>
+<td>{{ b.id }}</td>
+<td>{{ b.guest_name }}</td>
+<td>{{ b.total_price }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<h3>Top Homestay</h3>
+<ul>
+{% for t in top %}
+<li>{{ t.homestay__name }} - {{ t.total }} đ</li>
+{% endfor %}
+</ul>

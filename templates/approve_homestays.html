@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duyệt bài đăng Homestay</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --text:#0f172a;
+    --muted:#64748b;
+    --sidebar:#0f172a;
+    --primary:#3b82f6;
+    --success:#16a34a;
+    --danger:#ef4444;
+    --border:#e2e8f0;
+    --shadow:0 10px 30px rgba(15, 23, 42, 0.08);
+    --radius:18px;
+}
+
+body{
+    font-family:Poppins, sans-serif;
+    background:linear-gradient(135deg, #eef4ff 0%, #f8fafc 100%);
+    color:var(--text);
+}
+
+.container{
+    display:flex;
+    min-height:100vh;
+}
+
+.sidebar{
+    width:270px;
+    background:linear-gradient(180deg, #081225 0%, #0f172a 100%);
+    padding:26px 18px;
+    color:white;
+    position:sticky;
+    top:0;
+    height:100vh;
+    box-shadow:6px 0 24px rgba(2,6,23,0.15);
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:28px;
+    padding:10px 10px 18px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.brand-icon{
+    width:44px;
+    height:44px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg, #2563eb, #60a5fa);
+    font-size:22px;
+}
+
+.brand-text h2{
+    font-size:20px;
+    color:#fff;
+}
+
+.brand-text p{
+    font-size:12px;
+    color:#94a3b8;
+    margin-top:2px;
+}
+
+.nav-title{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:#64748b;
+    margin:18px 10px 12px;
+}
+
+.sidebar a{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px 14px;
+    margin-bottom:8px;
+    border-radius:14px;
+    text-decoration:none;
+    color:#cbd5e1;
+    font-size:14px;
+    font-weight:500;
+    transition:all 0.25s ease;
+}
+
+.sidebar a:hover{
+    background:rgba(255,255,255,0.08);
+    color:white;
+    transform:translateX(4px);
+}
+
+.sidebar a.active{
+    background:linear-gradient(135deg, #2563eb, #60a5fa);
+    color:white;
+    box-shadow:0 12px 24px rgba(37,99,235,0.25);
+}
+
+.main{
+    flex:1;
+    padding:30px;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+}
+
+.page-title h1{
+    font-size:32px;
+    margin-bottom:6px;
+    font-weight:700;
+}
+
+.page-title p{
+    color:var(--muted);
+    font-size:14px;
+}
+
+.topbar-badge{
+    background:var(--card);
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    padding:12px 16px;
+    border-radius:14px;
+    color:var(--muted);
+    font-size:13px;
+    font-weight:500;
+}
+
+.table-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+}
+
+.table-wrap{
+    width:100%;
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead th{
+    background:#0f172a;
+    color:white;
+    padding:14px 16px;
+    text-align:left;
+    font-size:13px;
+    font-weight:600;
+    white-space:nowrap;
+}
+
+tbody td{
+    padding:14px 16px;
+    border-bottom:1px solid var(--border);
+    font-size:14px;
+    vertical-align:middle;
+}
+
+tbody tr:hover{
+    background:#f8fbff;
+}
+
+tbody tr:last-child td{
+    border-bottom:none;
+}
+
+.accept{
+    background:#16a34a;
+    border:none;
+    padding:8px 14px;
+    color:white;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.reject{
+    background:#ef4444;
+    border:none;
+    padding:8px 14px;
+    color:white;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.action-group{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.empty-state{
+    text-align:center;
+    padding:28px 16px;
+    color:var(--muted);
+    font-size:14px;
+}
+
+.pagination{
+    margin-top:18px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
+.pagination a{
+    padding:8px 12px;
+    background:#0f172a;
+    color:white;
+    border-radius:10px;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:600;
+}
+
+.pagination span{
+    color:var(--muted);
+    font-size:14px;
+    font-weight:500;
+}
+
+@media(max-width:768px){
+    .container{
+        flex-direction:column;
+    }
+
+    .sidebar{
+        width:100%;
+        height:auto;
+        position:relative;
+    }
+
+    .main{
+        padding:18px;
+    }
+
+    .page-title h1{
+        font-size:26px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏠</div>
+            <div class="brand-text">
+                <h2>Quản trị</h2>
+                <p>WebGIS Homestay</p>
+            </div>
+        </div>
+
+        <div class="nav-title">Menu chính</div>
+        <a href="/dashboard/">📊 Tổng quan</a>
+        <a href="/dashboard/bookings/">🛏️ Đặt phòng</a>
+        <a href="/dashboard/revenue/">💰 Doanh thu</a>
+        <a href="/dashboard/homestays/">🏡 Homestay</a>
+        <a href="/dashboard/approve-homestays/" class="active">✅ Duyệt bài đăng</a>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <div class="page-title">
+                <h1>Duyệt bài đăng Homestay</h1>
+                <p>Kiểm tra và phê duyệt homestay do người dùng gửi lên</p>
+            </div>
+            <div class="topbar-badge">Approval Panel</div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên Homestay</th>
+                            <th>Người đăng</th>
+                            <th>Quận / Địa chỉ</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for h in page_obj %}
+                        <tr>
+                            <td>{{ h.id }}</td>
+                            <td>{{ h.name }}</td>
+                            <td>
+                                {% if h.owner %}
+                                    {{ h.owner.username }}
+                                {% else %}
+                                    ---
+                                {% endif %}
+                            </td>
+                            <td>{{ h.district }}</td>
+                            <td>
+                                <div class="action-group">
+                                    <a href="/dashboard/approve/{{ h.id }}/?next=/dashboard/approve-homestays/">
+                                        <button type="button" class="accept">✔ Duyệt</button>
+                                    </a>
+                                    <a href="/dashboard/reject/{{ h.id }}/?next=/dashboard/approve-homestays/">
+                                        <button type="button" class="reject">✖ Từ chối</button>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="empty-state">Không có homestay nào đang chờ duyệt</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">← Trước</a>
+            {% endif %}
+            <span>Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Sau →</a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

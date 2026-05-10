@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+
+<meta charset="UTF-8">
+<title>Homestay WebGIS</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"/>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+margin:0;
+font-family:'Poppins',sans-serif;
+background:#f1f5f9;
+}
+.header{
+background:linear-gradient(90deg,#1e3c72,#2a5298);
+color:white;
+padding:12px 25px;
+font-size:22px;
+font-weight:600;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+.main{
+display:flex;
+height:calc(100vh - 60px)
+}
+#map{
+flex:2;
+border-right:3px solid #ddd
+}
+.sidebar{
+flex:1;
+background:white;
+padding:20px;
+overflow-y:auto;
+box-shadow:-5px 0 15px rgba(0,0,0,0.1);
+}
+.result-item{
+padding:12px;
+border-radius:10px;
+margin-bottom:10px;
+background:#f8fafc;
+transition:0.3s;
+cursor:pointer;
+border:1px solid #e2e8f0;
+}
+.result-item:hover{
+transform:translateY(-3px);
+background:#e0f2fe;
+}
+.search-box{
+margin-bottom:10px;
+border-radius:10px;
+}
+button{
+border-radius:10px !important;
+transition:0.3s;
+}
+button:hover{
+transform:scale(1.05);
+}
+.count{
+color:#16a34a;
+font-weight:bold;
+margin-bottom:10px;
+}
+.range-value{
+font-size:14px;
+text-align:right;
+margin-top:-5px;
+margin-bottom:10px;
+color:#555;
+}
+
+/* 🔥 FIX POPUP ẢNH */
+.leaflet-popup-content{
+width:260px !important;
+}
+.leaflet-popup-content img{
+width:100%;
+height:150px;
+object-fit:cover;
+border-radius:10px;
+margin-bottom:5px;
+}
+
+/* 🔥 ROUTE PANEL GỌN */
+.leaflet-routing-container{
+background:white !important;
+border-radius:12px;
+padding:10px;
+font-size:13px;
+max-height:250px;
+overflow:auto;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+@media (max-width: 768px) {
+
+html, body {
+height: auto;
+overflow: auto;
+}
+
+/* header giữ trên */
+.header{
+font-size:16px;
+padding:10px;
+height:auto;
+}
+
+/* MAIN xếp dọc */
+.main{
+display:flex;
+flex-direction:column;
+height:auto;
+}
+
+/* MAP nửa trên */
+#map{
+flex: none;
+position: relative;
+top: 0;
+left: 0;
+width: 100%;
+height: 50vh;
+min-height: 350px;
+z-index: 1;
+border-right: none;
+border-bottom: 3px solid #ddd;
+}
+
+/* HIỂN THỊ LẠI SIDEBAR Ở NỬA DƯỚI */
+.sidebar{
+flex: none;
+display:block;
+width: 100%;
+height: auto;
+overflow: visible;
+}
+
+/* fix popup nhỏ hơn cho mobile */
+.leaflet-popup-content{
+width: 200px !important;
+}
+
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <div>🏡 WebGIS Homestay TP.HCM</div>
+</div>
+
+<div class="main">
+
+<div id="map"></div>
+
+<div class="sidebar">
+
+<h5>🔍 Tìm Homestay</h5>
+
+<input type="text" id="search" class="form-control search-box" placeholder="Tên homestay">
+
+<select id="district" class="form-select search-box">
+<option value="">-- Chọn quận --</option>
+<option>Quận 1</option>
+<option>Quận 3</option>
+<option>Quận 4</option>
+<option>Quận 5</option>
+<option>Quận 7</option>
+<option>Bình Thạnh</option>
+<option>Tân Bình</option>
+<option>Thủ Đức</option>
+</select>
+
+<label>💰 Giá tối đa (VNĐ)</label>
+<input type="range" id="priceRange" min="100000" max="5000000" step="100000" value="2000000" class="form-range">
+<div class="range-value" id="priceValue">2,000,000 VNĐ</div>
+
+<button onclick="loadHomestays()" class="btn btn-primary w-100 mb-2">
+Tìm kiếm
+</button>
+
+<label>📍 Bán kính (km)</label>
+<input type="range" id="radius" min="1" max="10" value="3" class="form-range">
+
+<button onclick="searchRadius()" class="btn btn-secondary w-100 mb-2">
+Khoanh vùng
+</button>
+
+<div id="result-count" class="count"></div>
+
+<hr>
+
+<h5>📋 Danh sách</h5>
+<div id="homestay-list"></div>
+
+</div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+<script>
+
+var map = L.map('map').setView([10.7769,106.7009],11)
+
+L.tileLayer(
+'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+{ attribution:'Google Maps' }
+).addTo(map)
+
+var markers=[]
+var allHomestays=[]
+
+var drawnItems = new L.FeatureGroup()
+map.addLayer(drawnItems)
+
+var userLocation=null
+var routingControl=null
+var radiusCircle=null
+
+// 🔥 giữ nguyên DRAW TOOL
+var drawControl = new L.Control.Draw({
+draw:{
+polygon:true,
+rectangle:true,
+circle:false,
+marker:false,
+polyline:false
+},
+edit:{
+featureGroup:drawnItems
+}
+})
+map.addControl(drawControl)
+
+// 🔥 PING MAP (giữ nguyên + fix đẹp)
+var selectedLocation=null
+var selectedMarker=null
+
+map.on("click", function(e){
+
+selectedLocation=[e.latlng.lat,e.latlng.lng]
+
+if(selectedMarker){
+map.removeLayer(selectedMarker)
+}
+
+selectedMarker=L.marker(selectedLocation)
+.addTo(map)
+.bindPopup("📍 Điểm bạn chọn")
+.openPopup()
+
+})
+
+// ===== PRICE =====
+document.getElementById("priceRange").oninput=function(){
+document.getElementById("priceValue").innerText=
+Number(this.value).toLocaleString()+" VNĐ"
+}
+
+// ===== LOCATION =====
+function getUserLocation(){
+if(navigator.geolocation){
+navigator.geolocation.getCurrentPosition(function(pos){
+userLocation=[pos.coords.latitude,pos.coords.longitude]
+L.marker(userLocation).addTo(map).bindPopup("📍 Vị trí của bạn")
+})
+}
+}
+
+// ===== CLEAR =====
+function clearMarkers(){
+markers.forEach(m=>map.removeLayer(m))
+markers=[]
+}
+
+// ===== GOOGLE =====
+function openGoogleMaps(lat,lon){
+let start=selectedLocation || userLocation
+if(!start){
+alert("Chưa có vị trí")
+return
+}
+let url=`https://www.google.com/maps/dir/?api=1&origin=${start[0]},${start[1]}&destination=${lat},${lon}`
+window.open(url,"_blank")
+}
+
+// ===== ROUTE =====
+function routeTo(lat,lon){
+
+let start=selectedLocation || userLocation
+
+if(!start){
+alert("Chưa có vị trí")
+return
+}
+
+if(routingControl){
+map.removeControl(routingControl)
+}
+
+routingControl=L.Routing.control({
+waypoints:[
+L.latLng(start[0],start[1]),
+L.latLng(lat,lon)
+],
+show:true,
+addWaypoints:false,
+draggableWaypoints:false,
+createMarker:()=>null
+}).addTo(map)
+
+}
+
+// ===== RENDER =====
+function renderHomestays(data){
+
+clearMarkers()
+
+let maxPrice=document.getElementById("priceRange").value
+data=data.filter(h=>h.price<=maxPrice)
+
+document.getElementById("homestay-list").innerHTML=""
+document.getElementById("result-count").innerText=
+"Tìm thấy "+data.length+" homestay"
+
+data.forEach(item=>{
+
+let popup=`
+
+<img src="${
+item.image || getAIImage(item.id)
+}">
+<h6>${item.name}</h6>
+
+<p>Quận: ${item.district}</p>
+
+<p>Giá: ${item.price.toLocaleString()} VNĐ</p>
+
+<button onclick="routeTo(${item.latitude},${item.longitude})"
+class="btn btn-sm btn-success mb-1 w-100">
+Chỉ đường
+</button>
+
+<button onclick="openGoogleMaps(${item.latitude},${item.longitude})"
+class="btn btn-sm btn-danger mb-1 w-100">
+Google Maps
+</button>
+
+<a href="/homestay/${item.id}/"
+class="btn btn-sm btn-info mb-1 w-100 text-white">
+Chi tiết
+</a>
+
+` + (item.has_empty_rooms ? `
+<a href="/booking/${item.id}/"
+class="btn btn-sm btn-primary w-100">
+Đặt ngay
+</a>
+` : `
+<button class="btn btn-sm btn-secondary w-100" disabled>
+Hết phòng
+</button>
+`)
+
+let marker=L.marker([item.latitude,item.longitude])
+.addTo(map)
+.bindPopup(popup)
+
+markers.push(marker)
+
+let div=document.createElement("div")
+div.className="result-item"
+
+div.innerHTML=`
+<b>${item.name}</b><br>
+${item.district}<br>
+💰 ${item.price.toLocaleString()}
+`
+
+div.onclick=function(){
+map.setView([item.latitude,item.longitude],15)
+marker.openPopup()
+}
+
+document.getElementById("homestay-list").appendChild(div)
+
+})
+
+}
+
+// ===== LOAD =====
+function loadHomestays(){
+
+let search=document.getElementById("search").value
+let district=document.getElementById("district").value
+
+fetch(`/api/homestays/?search=${search}&district=${district}`)
+.then(res=>res.json())
+.then(data=>{
+allHomestays=data
+renderHomestays(data)
+})
+
+}
+
+// ===== RADIUS =====
+function searchRadius(){
+
+let start=selectedLocation || userLocation
+if(!start)return
+
+let km=document.getElementById("radius").value
+let radius=km*1000
+
+if(radiusCircle){
+map.removeLayer(radiusCircle)
+}
+
+radiusCircle=L.circle(start,{
+radius:radius,
+color:"blue",
+fillOpacity:0.1
+}).addTo(map)
+
+let results=[]
+
+allHomestays.forEach(h=>{
+let d=map.distance(start,[h.latitude,h.longitude])
+if(d<=radius) results.push(h)
+})
+
+renderHomestays(results)
+
+}
+
+// ===== DRAW =====
+map.on(L.Draw.Event.CREATED,function(e){
+
+drawnItems.clearLayers()
+drawnItems.addLayer(e.layer)
+
+let bounds=e.layer.getBounds()
+
+let results=[]
+
+allHomestays.forEach(h=>{
+let latlng=L.latLng(h.latitude,h.longitude)
+if(bounds.contains(latlng)){
+results.push(h)
+}
+})
+
+renderHomestays(results)
+
+})
+
+getUserLocation()
+loadHomestays()
+function getAIImage(id){
+
+const images = [
+"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
+"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
+"https://images.unsplash.com/photo-1507089947368-19c1da9775ae",
+"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+"https://images.unsplash.com/photo-1501183638710-841dd1904471",
+"https://images.unsplash.com/photo-1493809842364-78817add7ffb",
+"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688",
+"https://images.unsplash.com/photo-1484154218962-a197022b5858"
+];
+
+// không random → cố định theo id
+return images[id % images.length];
+
+}
+
+</script>
+
+</body>
+</html>

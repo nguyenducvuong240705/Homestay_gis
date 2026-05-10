@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Trang cá nhân - {{ user.username }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar-custom { background: #ff385c; padding: 15px 60px; color: white; }
+        .user-header { background: white; padding: 30px; border-bottom: 1px solid #dee2e6; margin-bottom: 30px; }
+        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .nav-pills .nav-link.active { background-color: #ff385c; }
+        .nav-link { color: #555; font-weight: 500; }
+        .commission-box { background: #fff8f1; border: 1px dashed #fd7e14; padding: 15px; border-radius: 8px; }
+        @media (max-width: 768px) {
+            .navbar-custom { flex-direction: column; text-align: center; padding: 15px; }
+            .navbar-custom div { margin-top: 10px; }
+            .user-header { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar-custom d-flex justify-content-between align-items-center">
+    <a href="/" style="color:white; text-decoration:none; font-weight:bold; font-size:20px;">🏠 WebGIS Homestay</a>
+    <div>
+        <span class="me-3">👤 {{ user.username }}</span>
+        <a href="/logout/" class="btn btn-outline-light btn-sm">Đăng xuất</a>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card p-3">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+                    <button class="nav-link active mb-2" id="tab-booking" data-bs-toggle="pill" data-bs-target="#content-booking">📑 Đặt chỗ của tôi</button>
+                    <button class="nav-link mb-2" id="tab-post" data-bs-toggle="pill" data-bs-target="#content-post">🏠 Đăng bài Homestay</button>
+                    <button class="nav-link" id="tab-history" data-bs-toggle="pill" data-bs-target="#content-history">⏳ Lịch sử đăng bài</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="tab-content">
+                
+                <div class="tab-pane fade show active" id="content-booking">
+                    <h4 class="mb-4">Chuyến đi của bạn</h4>
+                    <div class="card p-4">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Homestay</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in user_bookings %}
+                                <tr>
+                                    <td><strong>{{ b.homestay.name }}</strong></td>
+                                    <td>{{ b.created_at|date:"d/m/Y" }}</td>
+                                    <td><span class="badge bg-success">Thành công</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted">Bạn chưa có đặt chỗ nào.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="content-post">
+                    <h4 class="mb-4">Đăng Homestay của bạn</h4>
+                    <div class="card p-4">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Tên Homestay</label>
+                                <input type="text" name="name" class="form-control" required placeholder="Ví dụ: Luxury Apartment Quận 1">
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Quận/Huyện</label>
+                                    <select name="district" class="form-select">
+                                        <option value="Quận 1">Quận 1</option>
+                                        <option value="Quận 3">Quận 3</option>
+                                        <option value="Quận 7">Quận 7</option>
+                                        <option value="Thủ Đức">Thủ Đức</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Giá thuê (VNĐ/Đêm)</label>
+                                    <input type="number" name="price" class="form-control" id="priceInput" oninput="calculateCommission()">
+                                </div>
+                            </div>
+
+                            <div class="commission-box mb-3">
+                                <h6>💰 Phí hoa hồng (10% duy trì hệ thống)</h6>
+                                <p class="mb-0 text-secondary">Admin sẽ nhận bài và duyệt sau khi bạn đồng ý phí: 
+                                    <span id="commissionValue" class="fw-bold text-danger">0 VNĐ</span>
+                                </p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Ảnh Homestay</label>
+                                <input type="file" name="image" class="form-control">
+                            </div>
+
+                            <button type="submit" class="btn btn-danger w-100 py-2">Gửi bài chờ Admin duyệt</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="content-history">
+                    <h4 class="mb-4">Trạng thái bài đăng</h4>
+                    <div class="card p-4">
+                        <ul class="list-group list-group-flush">
+                            {% for h in my_homestays %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ h.name }}
+                                {% if h.is_approved %}
+                                <span class="badge bg-primary">Đã hiển thị</span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark">Đang chờ duyệt...</span>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function calculateCommission() {
+        let price = document.getElementById('priceInput').value;
+        let commission = price * 0.1; // 10% hoa hồng
+        document.getElementById('commissionValue').innerText = new Intl.NumberFormat('vi-VN').format(commission) + " VNĐ";
+    }
+</script>
+{% include 'footer.html' %}
+</body>
+</html>

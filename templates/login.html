@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ page_title|default:"Đăng nhập" }}</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css"/>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:linear-gradient(135deg,#ff385c,#ff7a7a);
+}
+
+.main-wrapper{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+/* KHUNG */
+.auth-container{
+    background:rgba(255,255,255,0.95);
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.2);
+    width:100%;
+    max-width:400px;
+    backdrop-filter:blur(10px);
+    animation:fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* TIÊU ĐỀ */
+.auth-container h2{
+    text-align:center;
+    margin-bottom:20px;
+    font-weight:bold;
+    color:#333;
+}
+
+/* INPUT */
+.form-control{
+    border-radius:10px;
+    padding:12px;
+    transition:0.3s;
+    border:1px solid #ddd;
+    margin-top:6px;
+    margin-bottom:14px;
+}
+
+.form-control:focus{
+    border-color:#ff385c;
+    box-shadow:0 0 10px rgba(255,56,92,0.4);
+}
+
+/* LABEL */
+label{
+    font-weight:600;
+    color:#333;
+    margin-bottom:4px;
+    display:block;
+}
+
+/* NÚT */
+.btn-custom{
+    background:#ff385c;
+    color:white;
+    border:none;
+    font-weight:bold;
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    margin-top:10px;
+    transition:0.3s;
+}
+
+.btn-custom:hover{
+    background:black;
+    transform:scale(1.02);
+}
+
+/* LINK */
+.link-text{
+    text-align:center;
+    margin-top:15px;
+    display:block;
+    text-decoration:none;
+    color:#555;
+    transition:0.3s;
+}
+
+.link-text:hover{
+    color:#ff385c;
+}
+
+/* ERROR */
+.error-text{
+    color:#ff385c;
+    font-size:14px;
+    text-align:center;
+    margin-top:8px;
+    margin-bottom:8px;
+    font-weight:600;
+}
+
+/* MESSAGE */
+.message-box{
+    background:#fff1f2;
+    color:#be123c;
+    border:1px solid #fecdd3;
+    padding:10px 12px;
+    border-radius:10px;
+    margin-bottom:12px;
+    font-size:14px;
+    text-align:center;
+}
+
+/* ICON */
+.logo{
+    text-align:center;
+    font-size:28px;
+    margin-bottom:10px;
+}
+
+/* SHOW PASSWORD */
+.show-pass{
+    font-size:13px;
+    cursor:pointer;
+    color:#666;
+    margin-top:-8px;
+    margin-bottom:10px;
+    display:block;
+    text-align:right;
+    user-select:none;
+}
+
+.sub-text{
+    text-align:center;
+    color:#666;
+    font-size:14px;
+    margin-bottom:18px;
+}
+</style>
+</head>
+
+<body>
+<div class="main-wrapper">
+<div class="auth-container" data-aos="zoom-in">
+
+    <div class="logo">🏠</div>
+
+    <h2>{{ page_title|default:"Đăng nhập" }}</h2>
+    <div class="sub-text">Vui lòng nhập tài khoản để tiếp tục</div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message-box">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div>
+            <label for="username">Tên đăng nhập</label>
+            <input type="text" id="username" name="username" class="form-control" required>
+        </div>
+
+        <div>
+            <label for="password">Mật khẩu</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+            <span class="show-pass" onclick="togglePass()">👁️ Hiện / Ẩn mật khẩu</span>
+        </div>
+
+        {% if form.errors %}
+            <p class="error-text">❌ Thông tin đăng nhập không chính xác!</p>
+        {% endif %}
+
+        <button type="submit" class="btn btn-custom">Đăng nhập</button>
+    </form>
+
+    <a href="/register/" class="link-text">Chưa có tài khoản? Đăng ký ngay</a>
+    <a href="/" class="link-text">← Quay về trang chủ</a>
+
+</div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+AOS.init();
+
+function togglePass(){
+    let input = document.getElementById("password");
+    if(input.type === "password"){
+        input.type = "text";
+    }else{
+        input.type = "password";
+    }
+}
+</script>
+
+{% include 'footer.html' %}
+</body>
+</html>
